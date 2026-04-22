@@ -1,25 +1,29 @@
 services:
   api:
-    container_name: karrio.api
-    image: karrio.docker.scarf.sh/karrio/server:$KARRIO_TAG
+    container_name: 3dbyte-karrio-api
+    build:
+      context: ..
+      dockerfile: docker/api/Dockerfile
+      args:
+        REQUIREMENTS: source.requirements.txt
+    image: 3dbyte-karrio-server:$KARRIO_TAG
     restart: unless-stopped
     ports:
       - ${KARRIO_HTTP_PORT}:${KARRIO_HTTP_PORT}
-    depends_on:
-      - db
-      - redis
     environment:
       DEBUG_MODE: "True"
       DETACHED_WORKER: "True"
       SECRET_KEY: ${SECRET_KEY}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_ENGINE: ${DATABASE_ENGINE}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      # REDIS_URL: "redis://3dbyte-redis:6379/5"
+      REDIS_HOST: 172.18.0.2
+      REDIS_PORT: 6379
+      DATABASE_URL: ${DATABASE_URL}
+      # DATABASE_HOST: ${DATABASE_HOST}
+      # DATABASE_PORT: ${DATABASE_PORT}
+      # DATABASE_NAME: ${DATABASE_NAME}
+      # DATABASE_ENGINE: ${DATABASE_ENGINE}
+      # DATABASE_USERNAME: ${DATABASE_USERNAME}
+      # DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       KARRIO_HTTP_PORT: ${KARRIO_HTTP_PORT}
       ENABLE_ALL_PLUGINS_BY_DEFAULT: "True"
       # OpenTelemetry Configuration (Optional)
@@ -41,23 +45,28 @@ services:
       start_period: 60s
 
   worker:
-    container_name: karrio.worker
-    image: karrio.docker.scarf.sh/karrio/server:$KARRIO_TAG
+    container_name: 3dbyte-karrio-worker
+    build:
+      context: ..
+      dockerfile: docker/api/Dockerfile
+      args:
+        REQUIREMENTS: source.requirements.txt
+    image: 3dbyte-karrio-server:$KARRIO_TAG
     restart: unless-stopped
     depends_on:
-      - db
-      - redis
       - api
     environment:
       DEBUG_MODE: "True"
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_ENGINE: ${DATABASE_ENGINE}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      # REDIS_URL: "redis://3dbyte-redis:6379/5"
+      REDIS_HOST: 172.18.0.2
+      REDIS_PORT: 6379
+      DATABASE_URL: ${DATABASE_URL}
+      # DATABASE_HOST: ${DATABASE_HOST}
+      # DATABASE_PORT: ${DATABASE_PORT}
+      # DATABASE_NAME: ${DATABASE_NAME}
+      # DATABASE_ENGINE: ${DATABASE_ENGINE}
+      # DATABASE_USERNAME: ${DATABASE_USERNAME}
+      # DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       ENABLE_ALL_PLUGINS_BY_DEFAULT: "True"
       # OpenTelemetry Configuration (Optional)
       OTEL_ENABLED: ${OTEL_ENABLED:-false}
@@ -74,8 +83,11 @@ services:
     command: "/bin/bash ./worker"
 
   dashboard:
-    container_name: karrio.dashboard
-    image: karrio.docker.scarf.sh/karrio/dashboard:$KARRIO_TAG
+    container_name: 3dbyte-karrio-dashboard
+    build:
+      context: ..
+      dockerfile: docker/dashboard/Dockerfile
+    image: 3dbyte-karrio-dashboard:$KARRIO_TAG
     restart: unless-stopped
     ports:
       - ${DASHBOARD_PORT:-3002}:${DASHBOARD_PORT:-3002}/tcp
@@ -92,38 +104,43 @@ services:
       KARRIO_URL: http://api:${KARRIO_HTTP_PORT:-5002}
 
   maildev:
-    container_name: karrio.mail
+    container_name: 3dbyte-karrio-mail
     image: maildev/maildev
     restart: on-failure
     ports:
       - "1080:1080"
       - "1025:1025"
 
+networks:
+  default:
+    name: 3dbyte-network
+    external: true
+
   # Comment out everything below this point if you are using an external database and redis instance.
-  db:
-    container_name: karrio.db
-    image: postgres:16
-    restart: unless-stopped
-    ports:
-      - ${DATABASE_PORT}:5432
-    environment:
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      PGDATA: /var/lib/postgresql/data/karrio
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+  # db:
+  #   container_name: karrio.db
+  #   image: postgres:16
+  #   restart: unless-stopped
+  #   ports:
+  #     - ${DATABASE_PORT}:5432
+  #   environment:
+  #     POSTGRES_DB: ${DATABASE_NAME}
+  #     POSTGRES_USER: ${DATABASE_USERNAME}
+  #     POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+  #     PGDATA: /var/lib/postgresql/data/karrio
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
 
-  redis:
-    container_name: karrio.redis
-    image: redis
-    restart: unless-stopped
-    ports:
-      - ${REDIS_PORT}:6379
-    # command: redis-server --requirepass ${REDIS_PASSWORD}
-    volumes:
-      - redis-data:/data
+  # redis:
+  #   container_name: karrio.redis
+  #   image: redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - ${REDIS_PORT}:6379
+  #   # command: redis-server --requirepass ${REDIS_PASSWORD}
+  #   volumes:
+  #     - redis-data:/data
 
-volumes:
-  postgres-data:
-  redis-data:
+# volumes:
+#   postgres-data:
+#   redis-data:

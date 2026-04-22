@@ -11,7 +11,7 @@ import decouple
 from karrio.server.huey.configuration import create_huey_instance
 from karrio.server.settings.base import *
 
-INSTALLED_APPS += ["huey.contrib.djhuey", "karrio.server.huey"]  # type: ignore
+INSTALLED_APPS += ["karrio.server.huey"]  # type: ignore
 
 _WORKER_IMMEDIATE = decouple.config("WORKER_IMMEDIATE_MODE", default=False, cast=bool)
 _DETACHED = decouple.config("DETACHED_WORKER", default=False, cast=bool)

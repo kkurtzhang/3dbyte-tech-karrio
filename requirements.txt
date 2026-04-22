@@ -53,6 +53,7 @@ jsonschema-specifications==2025.9.1
 jstruct==2021.11
 jwcrypto==1.5.7
 karrio==2026.1.29
+karrio-aramex==2026.1.29
 karrio-australiapost==2026.1.29
 karrio-canadapost==2026.1.29
 karrio-chronopost==2026.1.29
@@ -83,6 +84,7 @@ karrio-server-data==2026.1.29
 karrio-server-documents==2026.1.29
 karrio-server-events==2026.1.29
 karrio-server-graph==2026.1.29
+karrio-server-huey==2026.1.29
 karrio-server-manager==2026.1.29
 karrio-server-orders==2026.1.29
 karrio-server-pricing==2026.1.29
