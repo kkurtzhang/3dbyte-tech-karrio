@@ -5,5 +5,5 @@ url = git@github.com:karrioapi/karrio-insiders.git
 path = ee/platform
 url = git@github.com:karrioapi/karrio-platform.git
 [submodule "community"]
-path = community
-url = https://github.com/karrioapi/community.git
+	path = community
+	url = https://github.com/kkurtzhang/community.git
