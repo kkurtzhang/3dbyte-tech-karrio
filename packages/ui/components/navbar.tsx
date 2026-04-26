@@ -8,6 +8,7 @@ import { Separator } from "@karrio/ui/components/ui/separator";
 import { AppLink } from "@karrio/ui/core/components/app-link";
 import { SearchBar } from "@karrio/ui/components/search-bar";
 import { useAPIMetadata } from "@karrio/hooks/api-metadata";
+import { useGraphQLCapabilities } from "@karrio/hooks/graphql-capabilities";
 import { Button } from "@karrio/ui/components/ui/button";
 import { Search, Blocks, Settings } from "lucide-react";
 import { useAppMode } from "@karrio/hooks/app-mode";
@@ -21,8 +22,12 @@ const AppLauncher = React.lazy(() =>
 // Main Navbar Component
 export function Navbar() {
   const { metadata } = useAPIMetadata();
+  const capabilities = useGraphQLCapabilities({
+    enabled: !!metadata?.APPS_MANAGEMENT,
+  });
   const { testMode } = useAppMode();
   const [showMobileSearchModal, setShowMobileSearchModal] = useState(false);
+  const appsSupported = !!metadata?.APPS_MANAGEMENT && capabilities.appsManagement;
 
   return (
     <>
@@ -60,7 +65,7 @@ export function Navbar() {
             <TestModeToggle />
 
             {/* App Launcher */}
-            {metadata?.APPS_MANAGEMENT && (
+            {appsSupported && (
               <Suspense fallback={<></>}>
                 <AppLauncher />
               </Suspense>

@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useMemo } from "react";
 import { useAPIToken, useAPITokenMutation } from "@karrio/hooks/api-token";
 import { useAPIKeys, useAPIKeyMutation, APIKeyType } from "@karrio/hooks/api-keys";
 import { useAPIMetadata } from "@karrio/hooks/api-metadata";
+import { useGraphQLCapabilities } from "@karrio/hooks/graphql-capabilities";
 import { AppLink } from "@karrio/ui/core/components/app-link";
 import { Button } from "@karrio/ui/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@karrio/ui/components/ui/card";
@@ -49,6 +50,10 @@ const DEFAULT_FORM_DATA: CreateFormData = {
 export default function APIKeyPage() {
   const { toast } = useToast();
   const { references, metadata } = useAPIMetadata();
+  const capabilities = useGraphQLCapabilities({
+    enabled: !!metadata?.APPS_MANAGEMENT,
+  });
+  const appsSupported = !!metadata?.APPS_MANAGEMENT && capabilities.oauthApps;
   const {
     query: { data: { token } = {}, ...query },
   } = useAPIToken();
@@ -275,7 +280,7 @@ export default function APIKeyPage() {
               <span>API Keys</span>
             </AppLink>
           </li>
-          {metadata?.APPS_MANAGEMENT && (
+          {appsSupported && (
             <li className={`is-capitalized has-text-weight-semibold`}>
               <AppLink href="/developers/apps" shallow={false} prefetch={false}>
                 <span>Apps</span>

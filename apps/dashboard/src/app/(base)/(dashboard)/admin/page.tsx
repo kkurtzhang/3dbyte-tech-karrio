@@ -1,3 +1,3 @@
 import { dynamicMetadata } from "@karrio/core/components/metadata";
-export { default } from "@karrio/admin/modules/platform";
+export { PlatformGate as default } from "@/components/feature-gates";
 export const generateMetadata = dynamicMetadata("Platform Console");

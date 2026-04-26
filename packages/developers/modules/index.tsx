@@ -1,6 +1,7 @@
 "use client";
 import { CopiableLink } from "@karrio/ui/core/components/copiable-link";
 import { useAPIMetadata } from "@karrio/hooks/api-metadata";
+import { useGraphQLCapabilities } from "@karrio/hooks/graphql-capabilities";
 import { AppLink } from "@karrio/ui/core/components/app-link";
 import { SelectField } from "@karrio/ui/core/components";
 import { useAPIUsage } from "@karrio/hooks/usage";
@@ -18,6 +19,10 @@ import moment from "moment";
 export default function ApiPage() {
   const Component = (): JSX.Element => {
     const { references, metadata } = useAPIMetadata();
+    const capabilities = useGraphQLCapabilities({
+      enabled: !!metadata?.APPS_MANAGEMENT,
+    });
+    const appsSupported = !!metadata?.APPS_MANAGEMENT && capabilities.oauthApps;
     const {
       query: { data: { usage } = {} },
       setFilter,
@@ -50,7 +55,7 @@ export default function ApiPage() {
                 <span>API Keys</span>
               </AppLink>
             </li>
-            {metadata?.APPS_MANAGEMENT && (
+            {appsSupported && (
               <li className={`is-capitalized has-text-weight-semibold`}>
                 <AppLink
                   href="/developers/apps"

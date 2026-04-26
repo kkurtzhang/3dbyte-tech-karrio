@@ -1,6 +1,10 @@
 "use client";
 import { OrganizationDropdown } from "./organization-dropdown";
 import { useAPIMetadata } from "@karrio/hooks/api-metadata";
+import {
+  useAdminGraphQLCapabilities,
+  useGraphQLCapabilities,
+} from "@karrio/hooks/graphql-capabilities";
 import { useAppMode } from "@karrio/hooks/app-mode";
 import { p, DASHBOARD_VERSION } from "@karrio/lib";
 import { usePathname } from "next/navigation";
@@ -18,6 +22,15 @@ export const ExpandedSidebar = (): JSX.Element => {
   } = useUser();
   const { testMode, basePath, switchMode } = useAppMode();
   const { metadata } = useAPIMetadata();
+  const appCapabilities = useGraphQLCapabilities({
+    enabled: !!metadata?.APPS_MANAGEMENT,
+  });
+  const adminCapabilities = useAdminGraphQLCapabilities({
+    enabled: !!(metadata?.ADMIN_DASHBOARD && user?.is_staff),
+  });
+  const appsSupported = !!metadata?.APPS_MANAGEMENT && appCapabilities.appsManagement;
+  const platformSupported =
+    !!metadata?.ADMIN_DASHBOARD && !!user?.is_staff && adminCapabilities.platform;
   const [showResourcesMenus, setShowResourcesMenus] = React.useState(false);
 
   const dismiss = (e: React.MouseEvent) => {
@@ -156,7 +169,7 @@ export const ExpandedSidebar = (): JSX.Element => {
         )}
 
         {/* App Store */}
-        {metadata?.APPS_MANAGEMENT && (
+        {appsSupported && (
           <>
             <AppLink
               href="/app-store"
@@ -247,7 +260,7 @@ export const ExpandedSidebar = (): JSX.Element => {
           )}
 
         {/* Administration */}
-        {metadata?.ADMIN_DASHBOARD && user?.is_staff && (
+        {platformSupported && (
           <>
             <AppLink
               href="/admin"

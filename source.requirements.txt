@@ -54,6 +54,7 @@ jstruct==2021.11
 jwcrypto==1.5.7
 karrio @ file://${PWD}/modules/sdk
 karrio_aramex @ file://${PWD}/community/plugins/aramex
+karrio_aramex_aunz @ file://${PWD}/community/plugins/aramex_aunz
 karrio_australiapost @ file://${PWD}/modules/connectors/australiapost
 karrio_canadapost @ file://${PWD}/modules/connectors/canadapost
 karrio_chronopost @ file://${PWD}/modules/connectors/chronopost

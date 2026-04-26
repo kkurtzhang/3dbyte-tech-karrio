@@ -30,6 +30,7 @@ import {
   SidebarMenuButton,
 } from "@karrio/ui/components/ui/sidebar"
 import { useAPIMetadata } from "@karrio/hooks/api-metadata"
+import { useAdminGraphQLCapabilities } from "@karrio/hooks/graphql-capabilities"
 import { useUser } from "@karrio/hooks/user"
 import { useAppMode } from "@karrio/hooks/app-mode"
 
@@ -39,6 +40,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const {
     query: { data: { user } = {} },
   } = useUser();
+  const adminCapabilities = useAdminGraphQLCapabilities({
+    enabled: !!(metadata?.ADMIN_DASHBOARD && user?.is_staff),
+  });
+  const platformSupported =
+    !!metadata?.ADMIN_DASHBOARD && !!user?.is_staff && adminCapabilities.platform;
+  const staffSupported =
+    !!metadata?.ADMIN_DASHBOARD && !!user?.is_staff && adminCapabilities.staff;
+  const carrierNetworkSupported =
+    !!metadata?.ADMIN_DASHBOARD && !!user?.is_staff && adminCapabilities.carrierNetwork;
 
   // Navigation items based on Karrio features - matching expanded-sidebar.tsx exactly
   const navMain = [
@@ -110,14 +120,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         },
       ],
     }] : []),
-    ...(metadata?.ADMIN_DASHBOARD && user?.is_staff ? [{
+    ...(platformSupported ? [{
       title: "Platform",
       url: "/admin",
       icon: Shield,
       items: [
         { title: "Console", url: "/admin" },
-        { title: "Staff & Permissions", url: "/admin/staff" },
-        { title: "Carrier Network", url: "/admin/carriers" },
+        ...(staffSupported
+          ? [{ title: "Staff & Permissions", url: "/admin/staff" }]
+          : []),
+        ...(carrierNetworkSupported
+          ? [{ title: "Carrier Network", url: "/admin/carriers" }]
+          : []),
       ],
     }] : []),
   ];

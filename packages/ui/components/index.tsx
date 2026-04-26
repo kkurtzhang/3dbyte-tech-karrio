@@ -3,6 +3,8 @@ export * from "./address-combobox";
 export * from "./enhanced-select";
 export * from "./status-badge";
 export * from "./status-code-badge";
+export * from "./feature-unavailable";
+export * from "./spinner";
 
 // Settings Management Components
 export * from "./settings-layout";

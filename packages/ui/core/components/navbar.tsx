@@ -1,5 +1,6 @@
 "use client";
 import { useAPIMetadata } from "@karrio/hooks/api-metadata";
+import { useGraphQLCapabilities } from "@karrio/hooks/graphql-capabilities";
 import { ShortcutDropdown } from "./shortcut-dropdown";
 import { AccountDropdown } from "./account-dropdown";
 import { SearchBar } from "../forms/search-bar";
@@ -13,6 +14,10 @@ const AppLauncher = React.lazy(() =>
 
 export const Navbar = ({ }): JSX.Element => {
   const { metadata } = useAPIMetadata();
+  const capabilities = useGraphQLCapabilities({
+    enabled: !!metadata?.APPS_MANAGEMENT,
+  });
+  const appsSupported = !!metadata?.APPS_MANAGEMENT && capabilities.appsManagement;
   const openSidebar = (e: React.MouseEvent) => {
     e.preventDefault();
     document.querySelector(".plex-sidebar")?.classList.add("is-mobile-active");
@@ -41,7 +46,7 @@ export const Navbar = ({ }): JSX.Element => {
             <i className="fas fa-search"></i>
           </div>
 
-          {metadata?.APPS_MANAGEMENT && (
+          {appsSupported && (
             <Suspense fallback={
               <div className="nav-item is-flex">
                 <button className="button is-white is-small" disabled>

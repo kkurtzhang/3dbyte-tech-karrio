@@ -36,7 +36,7 @@ services:
       OTEL_ENVIRONMENT: ${OTEL_ENVIRONMENT:-development}
 
     volumes:
-      - ${KARRIO_PLUGINS:-./plugins}:/karrio/plugins
+      - ${KARRIO_ARAMEX_AUNZ_PLUGIN:-../community/plugins/aramex_aunz}:/karrio/plugins/aramex_aunz
     healthcheck:
       test: curl --fail http://api:5002/ || exit 1
       interval: 40s
@@ -78,7 +78,7 @@ services:
       OTEL_ENVIRONMENT: ${OTEL_ENVIRONMENT:-development}
 
     volumes:
-      - ${KARRIO_PLUGINS:-./plugins}:/karrio/plugins
+      - ${KARRIO_ARAMEX_AUNZ_PLUGIN:-../community/plugins/aramex_aunz}:/karrio/plugins/aramex_aunz
 
     command: "/bin/bash ./worker"
 

@@ -13,6 +13,7 @@ import { useLoader } from "@karrio/ui/core/components/loader";
 import { AppLink } from "@karrio/ui/core/components/app-link";
 import { Spinner } from "@karrio/ui/core/components/spinner";
 import { useAPIMetadata } from "@karrio/hooks/api-metadata";
+import { useGraphQLCapabilities } from "@karrio/hooks/graphql-capabilities";
 import React, { useContext, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useEvents } from "@karrio/hooks/event";
@@ -24,6 +25,10 @@ export default function EventsPage() {
     const searchParams = useSearchParams();
     const { setLoading } = useLoader();
     const { metadata } = useAPIMetadata();
+    const capabilities = useGraphQLCapabilities({
+      enabled: !!metadata?.APPS_MANAGEMENT,
+    });
+    const appsSupported = !!metadata?.APPS_MANAGEMENT && capabilities.oauthApps;
     const { previewEvent } = useContext(EventPreviewContext);
     const [initialized, setInitialized] = React.useState(false);
     const {
@@ -84,7 +89,7 @@ export default function EventsPage() {
                 <span>API Keys</span>
               </AppLink>
             </li>
-            {metadata?.APPS_MANAGEMENT && (
+            {appsSupported && (
               <li className={`is-capitalized has-text-weight-semibold`}>
                 <AppLink
                   href="/developers/apps"

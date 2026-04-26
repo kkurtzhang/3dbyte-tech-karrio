@@ -1,3 +1,3 @@
 import { dynamicMetadata } from "@karrio/core/components/metadata";
-export { default } from "@karrio/app-store/modules/Store";
+export { AppStoreGate as default } from "@/components/feature-gates";
 export const generateMetadata = dynamicMetadata("App Store");

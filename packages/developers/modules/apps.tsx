@@ -8,6 +8,7 @@ import { AppLink } from "@karrio/ui/core/components/app-link";
 import { useAppStore, useAppMutations } from "@karrio/hooks";
 import { Textarea } from "@karrio/ui/components/ui/textarea";
 import { useAPIMetadata } from "@karrio/hooks/api-metadata";
+import { useGraphQLCapabilities } from "@karrio/hooks/graphql-capabilities";
 import { Button } from "@karrio/ui/components/ui/button";
 import { Input } from "@karrio/ui/components/ui/input";
 import { Label } from "@karrio/ui/components/ui/label";
@@ -22,6 +23,10 @@ export default function AppsPage() {
     const { setLoading } = useLoader();
     const { toast } = useToast();
     const { metadata } = useAPIMetadata();
+    const capabilities = useGraphQLCapabilities({
+      enabled: !!metadata?.APPS_MANAGEMENT,
+    });
+    const appsSupported = !!metadata?.APPS_MANAGEMENT && capabilities.oauthApps;
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
     const [newlyCreatedApp, setNewlyCreatedApp] = useState<any>(null);
@@ -306,7 +311,7 @@ export default function AppsPage() {
                 <span>API Keys</span>
               </AppLink>
             </li>
-            {metadata?.APPS_MANAGEMENT && (
+            {appsSupported && (
               <li className={`is-capitalized has-text-weight-semibold is-active`}>
                 <AppLink
                   href="/developers/apps"

@@ -1968,6 +1968,9 @@ class ServiceLevelFeaturesType:
     # Neighbor delivery allowed
     neighbor_delivery: typing.Optional[bool] = None
 
+    # Transit Label
+    transit_label: typing.Optional[str] = None
+
     @staticmethod
     def parse(features: typing.Optional[dict]) -> "ServiceLevelFeaturesType":
         """Parse a features dict into ServiceLevelFeaturesType."""

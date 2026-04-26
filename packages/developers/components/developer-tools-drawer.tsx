@@ -8,6 +8,8 @@ import { X, Activity, Key, Webhook, Calendar, FileText, Settings, Terminal, Menu
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@karrio/ui/components/ui/tabs";
 import { Button } from "@karrio/ui/components/ui/button";
 import { cn } from "@karrio/ui/lib/utils";
+import { useGraphQLCapabilities } from "@karrio/hooks/graphql-capabilities";
+import { useAPIMetadata } from "@karrio/hooks/api-metadata";
 
 // Import view components
 import { WebhooksView } from "@karrio/developers/components/views/webhooks-view";
@@ -63,7 +65,7 @@ const CustomDrawerContent = React.forwardRef<
   </DrawerPortal>
 ));
 
-const VIEW_CONFIG: Record<string, { label: string; icon: any; component: React.ComponentType; adminOnly?: boolean }> = {
+const VIEW_CONFIG: Record<string, { label: string; icon: any; component: React.ComponentType; adminOnly?: boolean; requiresApps?: boolean }> = {
   activity: {
     label: "Activity",
     icon: Activity,
@@ -88,6 +90,7 @@ const VIEW_CONFIG: Record<string, { label: string; icon: any; component: React.C
     label: "Apps",
     icon: Settings,
     component: AppsView,
+    requiresApps: true,
   },
   webhooks: {
     label: "Webhooks",
@@ -126,13 +129,20 @@ const VIEW_CONFIG: Record<string, { label: string; icon: any; component: React.C
 
 export function DeveloperToolsDrawer() {
   const { isOpen, currentView, isAdminMode, closeDeveloperTools, setCurrentView } = useDeveloperTools();
+  const { metadata } = useAPIMetadata();
+  const capabilities = useGraphQLCapabilities({
+    enabled: !!metadata?.APPS_MANAGEMENT,
+  });
+  const appsSupported = !!metadata?.APPS_MANAGEMENT && capabilities.oauthApps;
 
   // Filter views based on admin mode
   const visibleViews = React.useMemo(() => {
     return Object.entries(VIEW_CONFIG).filter(
-      ([_, config]) => !config.adminOnly || isAdminMode
+      ([_, config]) =>
+        (!config.adminOnly || isAdminMode) &&
+        (!config.requiresApps || appsSupported)
     );
-  }, [isAdminMode]);
+  }, [appsSupported, isAdminMode]);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const dragInfoRef = React.useRef<{ startY: number; startTime: number; dragging: boolean } | null>(null);
 
@@ -144,6 +154,12 @@ export function DeveloperToolsDrawer() {
     });
     window.dispatchEvent(event);
   }, [isOpen]);
+
+  React.useEffect(() => {
+    if (!visibleViews.some(([viewKey]) => viewKey === currentView)) {
+      setCurrentView("activity");
+    }
+  }, [currentView, setCurrentView, visibleViews]);
 
   // Create a dedicated portal container for DevTools overlays with scoped dark theme
   React.useEffect(() => {

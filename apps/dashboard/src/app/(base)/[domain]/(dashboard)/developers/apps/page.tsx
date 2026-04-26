@@ -1,3 +1,3 @@
 import { dynamicMetadata } from "@karrio/core/components/metadata";
-export { default } from "@karrio/developers/modules/apps";
+export { DeveloperAppsGate as default } from "@/components/feature-gates";
 export const generateMetadata = dynamicMetadata("Apps");

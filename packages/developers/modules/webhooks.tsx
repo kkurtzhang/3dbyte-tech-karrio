@@ -16,6 +16,7 @@ import { useNotifier } from "@karrio/ui/core/components/notifier";
 import { NotificationType, WebhookType } from "@karrio/types";
 import { AppLink } from "@karrio/ui/core/components/app-link";
 import { useAPIMetadata } from "@karrio/hooks/api-metadata";
+import { useGraphQLCapabilities } from "@karrio/hooks/graphql-capabilities";
 import { formatDateTime, isNoneOrEmpty } from "@karrio/lib";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -30,6 +31,10 @@ export default function WebhooksPage() {
     const mutation = useWebhookMutation();
     const { notify } = useNotifier();
     const { metadata } = useAPIMetadata();
+    const capabilities = useGraphQLCapabilities({
+      enabled: !!metadata?.APPS_MANAGEMENT,
+    });
+    const appsSupported = !!metadata?.APPS_MANAGEMENT && capabilities.oauthApps;
     const { editWebhook } = useWebhookModal();
     const { testWebhook } = useTestWebhookModal();
     const { confirm: confirmDeletion } = useConfirmModalContext();
@@ -95,7 +100,7 @@ export default function WebhooksPage() {
                 <span>API Keys</span>
               </AppLink>
             </li>
-            {metadata?.APPS_MANAGEMENT && (
+            {appsSupported && (
               <li className={`is-capitalized has-text-weight-semibold`}>
                 <AppLink
                   href="/developers/apps"
